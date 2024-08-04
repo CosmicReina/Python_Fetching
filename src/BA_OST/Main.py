@@ -37,15 +37,14 @@ if __name__ == "__main__":
         # Track
         try:
             td = tds[0]
-            text = td.text
-            track = int(text)
+            track = int(td.string)
             has_track = True
         except ValueError:
             has_track = False
 
         # Artist
         if has_track and len(tds) > 2:
-            artist = tds[2].text.strip()
+            artist = tds[2].string.strip()
 
         # Track name
         if has_track:
