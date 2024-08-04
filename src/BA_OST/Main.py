@@ -13,19 +13,21 @@ async def download_audios(audio_infos: list):
 
 
 async def download_audio(audio_info: dict):
+    track_name = audio_info["track"]
+    track_audio = audio_info["audio"]
     async with aiohttp.ClientSession() as session:
-        async with session.get(audio_info["audio"]) as response:
+        async with session.get(track_audio) as response:
             start = time.time()
-            print(f"Downloading {audio_info['track']}...")
+            print(f"Download: {track_name}...")
 
             if response.status != 200:
                 raise Exception(f"Failed to fetch audio: {response.status}")
 
-            with open(f"audio/{audio_info['track']}.mp3", "wb") as file:
+            with open(f"audio/{track_name}.mp3", "wb") as file:
                 file.write(await response.read())
 
             end = time.time()
-            print(f"Downloaded {audio_info['track']} in {end - start:.2f} seconds")
+            print(f"Download: {track_name} finished in {end - start:.2f}s")
 
 
 if __name__ == "__main__":
@@ -46,6 +48,7 @@ if __name__ == "__main__":
     track = 0
     artist = ""
     for tr in trs[2:]:
+        # Dict
         info_keys = ["track", "audio"]
         audio_info = dict.fromkeys(info_keys)
         tds = tr.find_all("td")
@@ -78,13 +81,20 @@ if __name__ == "__main__":
             track_name = " - ".join([td.find(string=True, recursive=False).strip() for td in td_track])
         else:
             td_track = tds[0:-1]
-            track_name = " - ".join(
-                [str(track)] + [td.find(string=True, recursive=False).strip() for td in td_track] + [artist])
+            if len(td_track) > 1:
+                track_name = " - ".join(
+                    [str(track)] + [td.find(string=True, recursive=False).strip() for td in td_track])
+            else:
+                track_name = " - ".join(
+                    [str(track)] + [td.find(string=True, recursive=False).strip() for td in td_track] + [artist])
         track_name = unidecode.unidecode(track_name)
-        track_name = re.sub(r"[^a-zA-Z0-9\s]", "", track_name)
+        track_name = re.sub(r"[^a-zA-Z0-9()\-\s]", "", track_name)
         audio_info["track"] = track_name
 
         # Append to list
         audio_infos.append(audio_info)
+
+    # for audio_info in audio_infos:
+    #     print(audio_info)
 
     asyncio.run(download_audios(audio_infos))
