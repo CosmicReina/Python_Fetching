@@ -46,6 +46,7 @@ for tr in trs[2:]:
     if len(tds) > 2:
         artist = tds[2].text.strip()
 
+    # Track name
     if has_track_info:
         td_track = tds[0:-1]
         track_name = " - ".join([td.find(text=True, recursive=False).strip() for td in td_track])
