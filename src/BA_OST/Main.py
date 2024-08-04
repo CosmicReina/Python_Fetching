@@ -80,7 +80,8 @@ if __name__ == "__main__":
             td_track = tds[0:-1]
             track_name = " - ".join(
                 [str(track)] + [td.find(string=True, recursive=False).strip() for td in td_track] + [artist])
-            track_name = re.sub(r"[^a-zA-Z0-9\s]", "", track_name)
+        track_name = unidecode.unidecode(track_name)
+        track_name = re.sub(r"[^a-zA-Z0-9\s]", "", track_name)
         audio_info["track"] = track_name
 
         # Append to list
