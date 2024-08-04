@@ -1,8 +1,9 @@
-import aiohttp
-import time
-import requests
 import asyncio
 import re
+import time
+
+import aiohttp
+import requests
 import unidecode
 from bs4 import BeautifulSoup
 
