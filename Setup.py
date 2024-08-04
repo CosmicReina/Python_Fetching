@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name="Fetching",
@@ -7,5 +7,6 @@ setup(
         "requests",
         "bs4",
         "aiohttp",
+        "unidecode",
     ]
 )

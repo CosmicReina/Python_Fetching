@@ -1,6 +1,32 @@
 import aiohttp
+import time
 import requests
+import asyncio
+import re
+import unidecode
 from bs4 import BeautifulSoup
+
+
+async def download_audios(audio_infos: list):
+    tasks = [download_audio(audio_info) for audio_info in audio_infos]
+    await asyncio.gather(*tasks)
+
+
+async def download_audio(audio_info: dict):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(audio_info["audio"]) as response:
+            start = time.time()
+            print(f"Downloading {audio_info['track']}...")
+
+            if response.status != 200:
+                raise Exception(f"Failed to fetch audio: {response.status}")
+
+            with open(f"audio/{audio_info['track']}.mp3", "wb") as file:
+                file.write(await response.read())
+
+            end = time.time()
+            print(f"Downloaded {audio_info['track']} in {end - start:.2f} seconds")
+
 
 if __name__ == "__main__":
     url = "https://bluearchive.fandom.com/wiki/Soundtrack"
@@ -54,10 +80,10 @@ if __name__ == "__main__":
             td_track = tds[0:-1]
             track_name = " - ".join(
                 [str(track)] + [td.find(string=True, recursive=False).strip() for td in td_track] + [artist])
+            track_name = re.sub(r"[^a-zA-Z0-9\s]", "", track_name)
         audio_info["track"] = track_name
 
         # Append to list
         audio_infos.append(audio_info)
 
-    for audio_info in audio_infos:
-        print(audio_info)
+    asyncio.run(download_audios(audio_infos))
