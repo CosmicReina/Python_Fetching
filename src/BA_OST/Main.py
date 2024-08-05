@@ -25,8 +25,8 @@ async def download_audio(audio_info: dict):
     track_audio = audio_info["audio"]
     async with aiohttp.ClientSession() as session:
         async with session.get(track_audio) as response:
-            start = time.time()
             print(f"Download: {track_name}...")
+            start = time.time()
 
             if response.status != 200:
                 raise Exception(f"Failed to fetch audio: {response.status}")
