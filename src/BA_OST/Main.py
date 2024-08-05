@@ -8,6 +8,14 @@ import unidecode
 from bs4 import BeautifulSoup
 
 
+async def get_beautiful_soup(url: str) -> BeautifulSoup:
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status != 200:
+                raise Exception(f"Failed to fetch page: {response.status}")
+            return BeautifulSoup(await response.text(), "html.parser")
+
+
 async def download_audios(audio_infos: list):
     tasks = [download_audio(audio_info) for audio_info in audio_infos]
     await asyncio.gather(*tasks)
@@ -34,15 +42,9 @@ async def download_audio(audio_info: dict):
 if __name__ == "__main__":
     url = "https://bluearchive.fandom.com/wiki/Soundtrack"
 
-    response = requests.get(url)
-    if response.status_code != 200:
-        raise Exception(f"Failed to fetch page: {response.status_code}")
-
-    beautiful_soup = BeautifulSoup(response.text, "html.parser")
+    beautiful_soup = asyncio.run(get_beautiful_soup(url))
     table = beautiful_soup.find("table", {"class": "wikitable"})
-    if table is None:
-        raise Exception("Failed to find table")
-
+    
     trs = table.find_all("tr")
 
     audio_infos = []
@@ -94,8 +96,5 @@ if __name__ == "__main__":
 
         # Append to list
         audio_infos.append(audio_info)
-
-    # for audio_info in audio_infos:
-    #     print(audio_info)
 
     asyncio.run(download_audios(audio_infos))

@@ -12,11 +12,13 @@ async def get_beautiful_soup(url: str) -> BeautifulSoup:
 
 
 if __name__ == "__main__":
-    url_wiki = "https://bluearchive.fandom.com/wiki/"
+    url = "https://bluearchive.fandom.com"
     url_category = "https://bluearchive.fandom.com/wiki/Category:Students"
     beautiful_soup = asyncio.run(get_beautiful_soup(url_category))
     table = beautiful_soup.find("table", {"class": "article-table"})
+
     trs = table.find_all("tr")[1:]
+
     for tr in trs:
         td = tr.find_all("td")[0]
         a = td.find("a")
