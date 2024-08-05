@@ -3,7 +3,6 @@ import re
 import time
 
 import aiohttp
-import requests
 import unidecode
 from bs4 import BeautifulSoup
 
@@ -44,7 +43,7 @@ if __name__ == "__main__":
 
     beautiful_soup = asyncio.run(get_beautiful_soup(url))
     table = beautiful_soup.find("table", {"class": "wikitable"})
-    
+
     trs = table.find_all("tr")
 
     audio_infos = []

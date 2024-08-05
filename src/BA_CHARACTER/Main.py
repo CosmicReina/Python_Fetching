@@ -11,6 +11,15 @@ async def get_beautiful_soup(url: str) -> BeautifulSoup:
             return BeautifulSoup(await response.text(), "html.parser")
 
 
+async def download_images(hrefs: list[str]):
+    tasks = [download_image(href) for href in hrefs]
+    await asyncio.gather(*tasks)
+
+
+async def download_image(url: str):
+    pass
+
+
 if __name__ == "__main__":
     url = "https://bluearchive.fandom.com"
     url_category = "https://bluearchive.fandom.com/wiki/Category:Students"
@@ -19,8 +28,9 @@ if __name__ == "__main__":
 
     trs = table.find_all("tr")[1:]
 
+    hrefs = []
     for tr in trs:
         td = tr.find_all("td")[0]
         a = td.find("a")
         href = a["href"]
-        print(href)
+        hrefs.append(href)
