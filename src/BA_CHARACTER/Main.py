@@ -1,5 +1,6 @@
 import aiohttp
 import asyncio
+import time
 from bs4 import BeautifulSoup
 
 
@@ -18,29 +19,38 @@ async def download_images(hrefs: list[str]):
 
 
 async def download_image(session: aiohttp.ClientSession, url: str):
-    beautiful_soup = await get_beautiful_soup(url)
-    portable_infobox = beautiful_soup.find("aside", {"class": "portable-infobox"})
+    try:
+        print(f"Download: {url}...")
+        start = time.time()
 
-    # Name
-    h2 = portable_infobox.find("h2")
-    name_full = h2.text
-    name = name_full.split("/")[0].strip()
+        beautiful_soup = await get_beautiful_soup(url)
+        portable_infobox = beautiful_soup.find("aside", {"class": "portable-infobox"})
 
-    # Image
-    pi_image_collection = portable_infobox.find("div", {"class": "pi-image-collection"})
-    wds_tab__contents = pi_image_collection.find_all("div", {"class": "wds-tab__content"})[0:-1]
+        # Name
+        h2 = portable_infobox.find("h2")
+        name_full = h2.text
+        name = name_full.split("/")[0].strip()
 
-    # Icon
-    icon_contents = wds_tab__contents[0]
-    icon_a = icon_contents.find("a")
-    icon_href = icon_a["href"]
-    await download_image_with_session(session, icon_href, f"icon/{name}.png")
+        # Image
+        pi_image_collection = portable_infobox.find("div", {"class": "pi-image-collection"})
+        wds_tab__contents = pi_image_collection.find_all("div", {"class": "wds-tab__content"})[0:-1]
 
-    # Portrait
-    portrait_contents = wds_tab__contents[1]
-    portrait_a = portrait_contents.find("a")
-    portrait_href = portrait_a["href"]
-    await download_image_with_session(session, portrait_href, f"portrait/{name}.png")
+        # Icon
+        icon_contents = wds_tab__contents[0]
+        icon_a = icon_contents.find("a")
+        icon_href = icon_a["href"]
+        await download_image_with_session(session, icon_href, f"icon/{name}.png")
+
+        # Portrait
+        portrait_contents = wds_tab__contents[1]
+        portrait_a = portrait_contents.find("a")
+        portrait_href = portrait_a["href"]
+        await download_image_with_session(session, portrait_href, f"portrait/{name}.png")
+
+        end = time.time()
+        print(f"Download: {url} finished in {end - start:.2f}s")
+    except Exception as e:
+        print(f"Failed to download: {url} - {e}")
 
 
 async def download_image_with_session(session: aiohttp.ClientSession, url: str, file_name: str):
@@ -66,4 +76,4 @@ if __name__ == "__main__":
         href = a["href"]
         hrefs.append(url + href)
 
-    asyncio.run(download_images(["https://bluearchive.fandom.com/wiki/Aikiyo_Fuuka_(New_Year_ver.)"]))
+    asyncio.run(download_images(hrefs))
