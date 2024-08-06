@@ -38,7 +38,7 @@ async def download_audio(session: aiohttp.ClientSession, audio_info: dict):
         print(f"Download: {track_name} finished in {end - start:.2f}s.")
 
 
-if __name__ == "__main__":
+def main():
     print("Preparing to download audio files...")
 
     url = "https://bluearchive.fandom.com/wiki/Soundtrack"
@@ -104,3 +104,6 @@ if __name__ == "__main__":
     end = time.time()
     print(f"\nDownload finished in {end - start:.2f}s.")
 
+
+if __name__ == "__main__":
+    main()
