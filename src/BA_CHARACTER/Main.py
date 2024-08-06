@@ -24,16 +24,94 @@ async def download_image(session: aiohttp.ClientSession, url: str):
         start = time.time()
 
         beautiful_soup = await get_beautiful_soup(url)
-        portable_infobox = beautiful_soup.find("aside", {"class": "portable-infobox"})
+        infobox = beautiful_soup.find("aside", {"class": "portable-infobox"})
+        # print(infobox)
 
         # Name
-        h2 = portable_infobox.find("h2")
-        name_full = h2.text
-        name = name_full.split("/")[0].strip()
+        h2 = infobox.find("h2")
+        name = h2.text.split("/")[0].strip()
 
-        # wds_tab__contents = portable_infobox.find_all("div", {"class": "wds-tab__content"})
+        tabber = infobox.find("section", {"class": "wds-tabber"})
+
+        contents = tabber.find_all("div", class_="wds-tab__content", recursive=False)
+        # print("\n\n".join([str(wds_tab__content) for wds_tab__content in contents]))
+        # print(contents)
+
+        # Icon
+        content_icon = contents[0]
+        # print(content_icon)
+        content_icon_contents = content_icon.find_all("div", {"class": "wds-tab__content"})
+        if content_icon_contents:
+            for content in content_icon_contents:
+                a = content.find("a")
+                icon_href = a["href"]
+                print(icon_href)
+        else:
+            a = content_icon.find("a")
+            icon_href = a["href"]
+            print(icon_href)
+
+        # Portrait
+        content_portrait = contents[1]
+        # print(content_portrait)
+        content_portrait_contents = content_portrait.find_all("div", {"class": "wds-tab__content"})
+        if content_portrait_contents:
+            for content in content_portrait_contents:
+                a = content.find("a")
+                portrait_href = a["href"]
+                print(portrait_href)
+        else:
+            a = content_portrait.find("a")
+            portrait_href = a["href"]
+            print(portrait_href)
+
+
+        # print("1.")
+        # # print(contents[0])
         #
-        # wds_tab__content_icon = wds_tab__contents[0]
+        # print("2.")
+        # # print(contents[1])
+        #
+        # wds_tab__contents_contents = contents[1].find_all("div", {"class": "wds-tab__content"})
+        # print("\n\n".join([str(wds_tab__content) for wds_tab__content in wds_tab__contents_contents]))
+
+
+        # Contents
+        # tabber = infobox.find_all("div", {"class": "wds-tabber"})[0]
+        # print(tabber)
+        # contents = tabber.find_all("div", {"class": "wds-tab__content"})
+        #
+        # # Icon
+        # wds_tab__content_icon = contents[0]
+        # a_icon = wds_tab__content_icon.find("a")
+        # icon_href = a_icon["href"]
+        # print(icon_href)
+        #
+        # # Portrait
+        # wds_tab__content_portrait = contents[1]
+        # print(wds_tab__content_portrait)
+
+        # # Portrait
+        # wds_tab__content_portrait = contents[1]
+        # print(wds_tab__content_portrait)
+        # pi_image_collection = wds_tab__content_portrait.find("div", {"class": "pi-image-collection"})
+        # if pi_image_collection:
+        #     print("Case 1")
+        #     wds_tab__content_portraits = pi_image_collection.find_all("div", {"class": "wds-tab__content"})
+        #     print(len(wds_tab__content_portraits))
+        #     for wds_tab__content_portrait in wds_tab__content_portraits:
+        #         a_portrait = wds_tab__content_portrait.find("a")
+        #         portrait_href = a_portrait["href"]
+        #         print(portrait_href)
+        # else:
+        #     print("Case 2")
+        #     a_portrait = wds_tab__content_portrait.find("a")
+        #     portrait_href = a_portrait["href"]
+        #     print(portrait_href)
+
+        # contents = infobox.find_all("div", {"class": "wds-tab__content"})
+        #
+        # wds_tab__content_icon = contents[0]
         # print(wds_tab__content_icon)
         # a_icon = wds_tab__content_icon.find("a")
         # icon_href = a_icon["href"]
@@ -41,7 +119,7 @@ async def download_image(session: aiohttp.ClientSession, url: str):
         #
         # print("\n\n")
         #
-        # wds_tab__content_portrait = wds_tab__contents[1]
+        # wds_tab__content_portrait = contents[1]
         # print(wds_tab__content_portrait)
         # a_portrait = wds_tab__content_portrait.find("a")
         # portrait_href = a_portrait["href"]
@@ -77,4 +155,6 @@ if __name__ == "__main__":
         hrefs.append(url + href)
 
     # asyncio.run(download_images(hrefs))
-    asyncio.run(download_images(["https://bluearchive.fandom.com/wiki/Aikiyo_Fuuka_(New_Year_ver.)"]))
+    # asyncio.run(download_images(["https://bluearchive.fandom.com/wiki/Aikiyo_Fuuka_(New_Year_ver.)"]))
+    # asyncio.run(download_images(["https://bluearchive.fandom.com/wiki/Wanibuchi_Akari"]))
+    asyncio.run(download_images(["https://bluearchive.fandom.com/wiki/Hayase_Yuuka"]))
