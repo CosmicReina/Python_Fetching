@@ -129,7 +129,7 @@ def main():
     print(f"\nDownload finished in {end - start:.2f}s.")
 
 
-if __name__ == "__main__":
+def main_with_monitor():
     tracemalloc.start()
     monitor = ResourceMonitor()
     monitor.start()
@@ -146,3 +146,7 @@ if __name__ == "__main__":
     print(f"Peak RAM usage (tracemalloc): {peak / 2 ** 20:.2f} MB")
     print(f"Peak RAM usage (psutil): {monitor.max_memory / 2 ** 20:.2f} MB")
     print(f"Peak CPU usage: {monitor.max_cpu:.2f}%")
+
+
+if __name__ == "__main__":
+    main_with_monitor()
