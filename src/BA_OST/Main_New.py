@@ -1,10 +1,34 @@
 import asyncio
 import re
+import threading
 import time
+import tracemalloc
 
 import aiohttp
+import psutil
 import unidecode
 from bs4 import BeautifulSoup
+
+
+class ResourceMonitor(threading.Thread):
+    def __init__(self):
+        super().__init__()
+        self.max_memory = 0
+        self.max_cpu = 0
+        self.running = True
+        self.daemon = True
+
+    def run(self):
+        process = psutil.Process()
+        while self.running:
+            memory_info = process.memory_info()
+            cpu_percent = process.cpu_percent(interval=0.1)
+            self.max_memory = max(self.max_memory, memory_info.rss)
+            self.max_cpu = max(self.max_cpu, cpu_percent)
+            time.sleep(0.1)
+
+    def stop(self):
+        self.running = False
 
 
 async def get_beautiful_soup(url: str) -> BeautifulSoup:
@@ -106,4 +130,19 @@ def main():
 
 
 if __name__ == "__main__":
+    tracemalloc.start()
+    monitor = ResourceMonitor()
+    monitor.start()
+
     main()
+
+    monitor.stop()
+    monitor.join()
+
+    current, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+
+    print("\nResource usage:")
+    print(f"Peak RAM usage (tracemalloc): {peak / 2 ** 20:.2f} MB")
+    print(f"Peak RAM usage (psutil): {monitor.max_memory / 2 ** 20:.2f} MB")
+    print(f"Peak CPU usage: {monitor.max_cpu:.2f}%")
