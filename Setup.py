@@ -8,5 +8,6 @@ setup(
         "bs4",
         "aiohttp",
         "unidecode",
+        "psutil",
     ]
 )
