@@ -31,20 +31,16 @@ async def download_image(session: aiohttp.ClientSession, url: str):
         name_full = h2.text
         name = name_full.split("/")[0].strip()
 
-        # Image
-        pi_image_collection = portable_infobox.find("div", {"class": "pi-image-collection"})
-        wds_tab__contents = pi_image_collection.find_all("div", {"class": "wds-tab__content"})[0:-1]
+        wds_tab__contents = portable_infobox.find_all("div", {"class": "wds-tab__content"})
 
-        # Icon
-        icon_contents = wds_tab__contents[0]
-        icon_a = icon_contents.find("a")
-        icon_href = icon_a["href"]
+        wds_tab__content_icon = wds_tab__contents[0]
+        a_icon = wds_tab__content_icon.find("a")
+        icon_href = a_icon["href"]
         await download_image_with_session(session, icon_href, f"icon/{name}.png")
 
-        # Portrait
-        portrait_contents = wds_tab__contents[1]
-        portrait_a = portrait_contents.find("a")
-        portrait_href = portrait_a["href"]
+        wds_tab__content_portrait = wds_tab__contents[1]
+        a_portrait = wds_tab__content_portrait.find("a")
+        portrait_href = a_portrait["href"]
         await download_image_with_session(session, portrait_href, f"portrait/{name}.png")
 
         end = time.time()
