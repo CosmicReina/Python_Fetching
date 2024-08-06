@@ -31,7 +31,8 @@ async def download_image(session: aiohttp.ClientSession, url: str):
         h2 = infobox.find("h2")
         name = h2.text.split("/")[0].strip()
 
-        tabber = infobox.find("section", {"class": "wds-tabber"})
+        tabber = infobox.find(class_=["wds-tabber"])
+        print(tabber)
 
         contents = tabber.find_all("div", class_="wds-tab__content", recursive=False)
         # print("\n\n".join([str(wds_tab__content) for wds_tab__content in contents]))
@@ -155,6 +156,6 @@ if __name__ == "__main__":
         hrefs.append(url + href)
 
     # asyncio.run(download_images(hrefs))
-    # asyncio.run(download_images(["https://bluearchive.fandom.com/wiki/Aikiyo_Fuuka_(New_Year_ver.)"]))
+    asyncio.run(download_images(["https://bluearchive.fandom.com/wiki/Aikiyo_Fuuka_(New_Year_ver.)"]))
     # asyncio.run(download_images(["https://bluearchive.fandom.com/wiki/Wanibuchi_Akari"]))
-    asyncio.run(download_images(["https://bluearchive.fandom.com/wiki/Hayase_Yuuka"]))
+    # asyncio.run(download_images(["https://bluearchive.fandom.com/wiki/Hayase_Yuuka"]))
