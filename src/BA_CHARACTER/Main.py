@@ -31,17 +31,21 @@ async def download_image(session: aiohttp.ClientSession, url: str):
         name_full = h2.text
         name = name_full.split("/")[0].strip()
 
-        wds_tab__contents = portable_infobox.find_all("div", {"class": "wds-tab__content"})
-
-        wds_tab__content_icon = wds_tab__contents[0]
-        a_icon = wds_tab__content_icon.find("a")
-        icon_href = a_icon["href"]
-        await download_image_with_session(session, icon_href, f"icon/{name}.png")
-
-        wds_tab__content_portrait = wds_tab__contents[1]
-        a_portrait = wds_tab__content_portrait.find("a")
-        portrait_href = a_portrait["href"]
-        await download_image_with_session(session, portrait_href, f"portrait/{name}.png")
+        # wds_tab__contents = portable_infobox.find_all("div", {"class": "wds-tab__content"})
+        #
+        # wds_tab__content_icon = wds_tab__contents[0]
+        # print(wds_tab__content_icon)
+        # a_icon = wds_tab__content_icon.find("a")
+        # icon_href = a_icon["href"]
+        # await download_image_with_session(session, icon_href, f"icon/{name}.png")
+        #
+        # print("\n\n")
+        #
+        # wds_tab__content_portrait = wds_tab__contents[1]
+        # print(wds_tab__content_portrait)
+        # a_portrait = wds_tab__content_portrait.find("a")
+        # portrait_href = a_portrait["href"]
+        # await download_image_with_session(session, portrait_href, f"portrait/{name}.png")
 
         end = time.time()
         print(f"Download: {url} finished in {end - start:.2f}s")
@@ -72,4 +76,5 @@ if __name__ == "__main__":
         href = a["href"]
         hrefs.append(url + href)
 
-    asyncio.run(download_images(hrefs))
+    # asyncio.run(download_images(hrefs))
+    asyncio.run(download_images(["https://bluearchive.fandom.com/wiki/Aikiyo_Fuuka_(New_Year_ver.)"]))

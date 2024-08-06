@@ -16,26 +16,26 @@ async def get_beautiful_soup(url: str) -> BeautifulSoup:
 
 
 async def download_audios(audio_infos: list):
-    tasks = [download_audio(audio_info) for audio_info in audio_infos]
-    await asyncio.gather(*tasks)
+    async with aiohttp.ClientSession() as session:
+        tasks = [download_audio(session, audio_info) for audio_info in audio_infos]
+        await asyncio.gather(*tasks)
 
 
-async def download_audio(audio_info: dict):
+async def download_audio(session: aiohttp.ClientSession, audio_info: dict):
     track_name = audio_info["track"]
     track_audio = audio_info["audio"]
-    async with aiohttp.ClientSession() as session:
-        async with session.get(track_audio) as response:
-            print(f"Download: {track_name}...")
-            start = time.time()
+    async with session.get(track_audio) as response:
+        print(f"Download: {track_name}...")
+        start = time.time()
 
-            if response.status != 200:
-                raise Exception(f"Failed to fetch audio: {response.status}")
+        if response.status != 200:
+            raise Exception(f"Failed to fetch audio: {response.status}")
 
-            with open(f"audio/{track_name}.mp3", "wb") as file:
-                file.write(await response.read())
+        with open(f"audio/{track_name}.mp3", "wb") as file:
+            file.write(await response.read())
 
-            end = time.time()
-            print(f"Download: {track_name} finished in {end - start:.2f}s")
+        end = time.time()
+        print(f"Download: {track_name} finished in {end - start:.2f}s.")
 
 
 if __name__ == "__main__":
@@ -48,9 +48,9 @@ if __name__ == "__main__":
 
     trs = table.find_all("tr")
 
-    audio_infos = []
     track = 0
     artist = ""
+    audio_infos = []
     for tr in trs[2:]:
         # Dict
         info_keys = ["track", "audio"]
@@ -64,13 +64,11 @@ if __name__ == "__main__":
         if audio is None:
             continue
 
-        src = audio["src"]
-        audio_info["audio"] = src
+        audio_info["audio"] = audio["src"]
 
         # Track
         try:
-            td = tds[0]
-            track = int(td.string)
+            track = int(tds[0].string)
             has_track = True
         except ValueError:
             has_track = False
@@ -105,3 +103,4 @@ if __name__ == "__main__":
 
     end = time.time()
     print(f"\nDownload finished in {end - start:.2f}s.")
+
