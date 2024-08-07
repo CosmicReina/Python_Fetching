@@ -3,6 +3,7 @@ import re
 import threading
 import time
 import tracemalloc
+import os
 
 import aiohttp
 import psutil
@@ -62,7 +63,24 @@ async def download_audio(session: aiohttp.ClientSession, audio_info: dict):
         print(f"Download: {track_name} finished in {end - start:.2f}s.")
 
 
+def delete_audio_files(directory: str):
+    if not os.path.exists(directory):
+        print(f"Directory '{directory}' does not exist.")
+        return
+
+    file_list = os.listdir(directory)
+    file_amount = len(file_list)
+    deleted_file = 0
+    print(f"Deleting {file_amount} audio files...")
+    for file in file_list:
+        os.remove(f"{directory}/{file}")
+        deleted_file += 1
+    print(f"Deleted {deleted_file} audio files.")
+
+
 def main():
+    delete_audio_files("audio")
+
     print("Preparing to download audio files...")
 
     url = "https://bluearchive.fandom.com/wiki/Soundtrack"
