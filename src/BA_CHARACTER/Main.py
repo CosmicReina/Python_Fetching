@@ -1,4 +1,5 @@
 import asyncio
+import os
 import threading
 import time
 import tracemalloc
@@ -104,7 +105,25 @@ async def download_with_session(session: aiohttp.ClientSession, url: str, name: 
             file.write(await response.read())
 
 
+def delete_files(directory: str):
+    if not os.path.exists(directory):
+        print(f"Directory '{directory}' does not exist.")
+        return
+
+    file_list = os.listdir(directory)
+    file_amount = len(file_list)
+    deleted_file = 0
+    print(f"Deleting {file_amount} audio files...")
+    for file in file_list:
+        os.remove(f"{directory}/{file}")
+        deleted_file += 1
+    print(f"Deleted {deleted_file} audio files.")
+
+
 def main():
+    delete_files("icon")
+    delete_files("portrait")
+
     print("Preparing to download images...")
 
     url = "https://bluearchive.fandom.com"

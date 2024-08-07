@@ -1,9 +1,9 @@
 import asyncio
+import os
 import re
 import threading
 import time
 import tracemalloc
-import os
 
 import aiohttp
 import psutil
