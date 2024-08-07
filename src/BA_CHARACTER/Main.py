@@ -1,7 +1,32 @@
-import aiohttp
 import asyncio
+import threading
 import time
+import tracemalloc
+
+import aiohttp
+import psutil
 from bs4 import BeautifulSoup
+
+
+class ResourceMonitor(threading.Thread):
+    def __init__(self):
+        super().__init__()
+        self.max_memory = 0
+        self.max_cpu = 0
+        self.running = True
+        self.daemon = True
+
+    def run(self):
+        process = psutil.Process()
+        while self.running:
+            memory_info = process.memory_info()
+            cpu_percent = process.cpu_percent(interval=0.1)
+            self.max_memory = max(self.max_memory, memory_info.rss)
+            self.max_cpu = max(self.max_cpu, cpu_percent)
+            time.sleep(0.1)
+
+    def stop(self):
+        self.running = False
 
 
 async def get_beautiful_soup(url: str) -> BeautifulSoup:
@@ -79,7 +104,7 @@ async def download_with_session(session: aiohttp.ClientSession, url: str, name: 
             file.write(await response.read())
 
 
-if __name__ == "__main__":
+def main():
     url = "https://bluearchive.fandom.com"
     url_category = "https://bluearchive.fandom.com/wiki/Category:Students"
     beautiful_soup = asyncio.run(get_beautiful_soup(url_category))
@@ -95,3 +120,26 @@ if __name__ == "__main__":
         hrefs.append(url + href)
 
     asyncio.run(download_images(hrefs))
+
+
+def main_with_monitor():
+    tracemalloc.start()
+    monitor = ResourceMonitor()
+    monitor.start()
+
+    main()
+
+    monitor.stop()
+    monitor.join()
+
+    current, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+
+    print("\nResource usage:")
+    print(f"Peak RAM usage (tracemalloc): {peak / 2 ** 20:.2f} MB")
+    print(f"Peak RAM usage (psutil): {monitor.max_memory / 2 ** 20:.2f} MB")
+    print(f"Peak CPU usage: {monitor.max_cpu:.2f}%")
+
+
+if __name__ == "__main__":
+    main_with_monitor()
