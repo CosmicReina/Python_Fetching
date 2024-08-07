@@ -105,6 +105,8 @@ async def download_with_session(session: aiohttp.ClientSession, url: str, name: 
 
 
 def main():
+    print("Preparing to download images...")
+
     url = "https://bluearchive.fandom.com"
     url_category = "https://bluearchive.fandom.com/wiki/Category:Students"
     beautiful_soup = asyncio.run(get_beautiful_soup(url_category))
@@ -119,7 +121,13 @@ def main():
         href = a["href"]
         hrefs.append(url + href)
 
+    print("Downloading images...\n")
+    start = time.time()
+
     asyncio.run(download_images(hrefs))
+
+    end = time.time()
+    print(f"\nDownload finished in {end - start:.2f}s")
 
 
 def main_with_monitor():
