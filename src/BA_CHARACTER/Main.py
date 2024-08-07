@@ -95,7 +95,3 @@ if __name__ == "__main__":
         hrefs.append(url + href)
 
     asyncio.run(download_images(hrefs))
-    # asyncio.run(download_images(["https://bluearchive.fandom.com/wiki/Aikiyo_Fuuka_(New_Year_ver.)"]))
-    # asyncio.run(download_images(["https://bluearchive.fandom.com/wiki/Wanibuchi_Akari"]))
-    # asyncio.run(download_images(["https://bluearchive.fandom.com/wiki/Murokasa_Akane"]))
-    # asyncio.run(download_images(["https://bluearchive.fandom.com/wiki/Hayase_Yuuka"]))
