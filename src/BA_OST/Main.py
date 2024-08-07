@@ -63,7 +63,7 @@ async def download_audio(session: aiohttp.ClientSession, audio_info: dict):
         print(f"Download: {track_name} finished in {end - start:.2f}s.")
 
 
-def delete_audio_files(directory: str):
+def delete_files(directory: str):
     if not os.path.exists(directory):
         print(f"Directory '{directory}' does not exist.")
         return
@@ -79,7 +79,7 @@ def delete_audio_files(directory: str):
 
 
 def main():
-    delete_audio_files("audio")
+    delete_files("audio")
 
     print("Preparing to download audio files...")
 
