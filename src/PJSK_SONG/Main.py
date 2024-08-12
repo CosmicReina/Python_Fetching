@@ -27,8 +27,10 @@ async def get_beautiful_soup(url: str) -> BeautifulSoup:
 
 async def fetch_songs(list_songs: list):
     async with aiohttp.ClientSession() as session:
-        tasks = [fetch_song(session, song["url"], song["type_song"]) for song in list_songs]
-        await asyncio.gather(*tasks)
+        tasks = [asyncio.create_task(fetch_song(session, song["url"], song["type_song"])) for song in list_songs]
+        finished, unfinished = await asyncio.wait(tasks)
+        print(f"\nSongs finished: {len(finished)}")
+        print(f"Songs unfinished: {len(unfinished)}")
 
 
 async def fetch_song(session: aiohttp.ClientSession, url: str, type_song: str):
@@ -130,10 +132,10 @@ def main():
     # print(f"Fetching {songs_amount} songs...")
 
     # Test
-    # asyncio.run(fetch_songs([{
-    #     "type_song": type_commissioned_songs,
-    #     "url": "https://projectsekai.fandom.com/wiki/Kitty"
-    # }]))
+    asyncio.run(fetch_songs([{
+        "type_song": type_commissioned_songs,
+        "url": "https://projectsekai.fandom.com/wiki/Kitty"
+    }]))
 
 
 if __name__ == "__main__":
