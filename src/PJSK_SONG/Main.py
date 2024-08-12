@@ -42,13 +42,16 @@ async def fetch_song(session: aiohttp.ClientSession, url: str, type_song: str):
     if song_title is None:
         return
 
+    unit_div = beautiful_soup.find("div", attrs={"data-source": "unit"})
+    song_artist = unit_div.find("b").find("a").text
+
     trs_song = []
     for table in article_table:
         trs = table.find_all("tr")
         for tr in trs[1:]:
             trs_song.append(tr)
 
-    file_directory = f"songs/{type_song}/{song_title}"
+    file_directory = f"songs/{type_song}/{song_artist} - {song_title}"
     if len(trs_song) != 0:
         os.mkdir(file_directory)
 
@@ -127,10 +130,10 @@ def main():
     # print(f"Fetching {songs_amount} songs...")
 
     # Test
-    asyncio.run(fetch_songs([{
-        "type_song": type_commissioned_songs,
-        "url": "https://projectsekai.fandom.com/wiki/Kitty"
-    }]))
+    # asyncio.run(fetch_songs([{
+    #     "type_song": type_commissioned_songs,
+    #     "url": "https://projectsekai.fandom.com/wiki/Kitty"
+    # }]))
 
 
 if __name__ == "__main__":
