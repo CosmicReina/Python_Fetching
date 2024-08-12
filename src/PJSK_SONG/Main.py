@@ -69,8 +69,8 @@ async def fetch_song(session: aiohttp.ClientSession, url: str, type_song: str):
         return
 
     unit_div = beautiful_soup.find("div", attrs={"data-source": "unit"})
-    song_artist = unit_div.find("b").find("a").text
-    song_artist.replace("/", "-")
+    song_artist = unit_div.find("b").find("a").text.strip()
+    song_artist = song_artist.replace("/", "-")
 
     trs_song = []
     for table in article_table:
@@ -164,6 +164,11 @@ def main():
 
     end = time.time()
     print(f"\nDownload finished in {end - start:.2f}s")
+
+    # asyncio.run(fetch_songs([{
+    #     "type_song": type_commissioned_songs,
+    #     "url": "https://projectsekai.fandom.com/wiki/Flyway"
+    # }]))
 
 
 def main_with_monitor():
