@@ -1,6 +1,7 @@
 import asyncio
 import os
 import shutil
+import time
 
 import aiohttp
 from bs4 import BeautifulSoup
@@ -31,6 +32,9 @@ async def fetch_songs(list_songs: list):
 
 
 async def fetch_song(session: aiohttp.ClientSession, url: str, type_song: str):
+    print(f"Download: {url}...")
+    start = time.time()
+
     beautiful_soup = await get_beautiful_soup(url)
     article_table = beautiful_soup.find_all("table", class_="article-table")
 
@@ -57,6 +61,12 @@ async def fetch_song(session: aiohttp.ClientSession, url: str, type_song: str):
         name = f"{no} - {title}"
         if song is not None:
             await download_with_session(session, src, f"{file_directory}/{name}", "mp3")
+        else:
+            print(f"Failed to download: {name}")
+            return
+
+    end = time.time()
+    print(f"Download: {url} finished in {end - start:.2f}s")
 
 
 async def download_with_session(session: aiohttp.ClientSession, url: str, name: str, type: str):
