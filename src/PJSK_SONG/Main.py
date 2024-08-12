@@ -4,6 +4,8 @@ import shutil
 import threading
 import time
 import tracemalloc
+import re
+import gc
 
 import aiohttp
 import psutil
@@ -64,13 +66,16 @@ async def fetch_song(session: aiohttp.ClientSession, url: str, type_song: str):
     beautiful_soup = await get_beautiful_soup(url)
     article_table = beautiful_soup.find_all("table", class_="article-table")
 
-    song_title = beautiful_soup.find("h2", class_="pi-title").text
+    song_title = beautiful_soup.find("h2", class_="pi-title").text.strip()
     if song_title is None:
         return
+    song_title = re.sub(r'[\\/*?:"<>|]', '-', song_title)
 
     unit_div = beautiful_soup.find("div", attrs={"data-source": "unit"})
+    if unit_div is None:
+        return
     song_artist = unit_div.find("b").find("a").text.strip()
-    song_artist = song_artist.replace("/", "-")
+    song_artist = re.sub(r'[\\/*?:"<>|]', '-', song_artist)
 
     trs_song = []
     for table in article_table:
@@ -78,9 +83,9 @@ async def fetch_song(session: aiohttp.ClientSession, url: str, type_song: str):
         for tr in trs[1:]:
             trs_song.append(tr)
 
-    file_directory = f"songs/{type_song}/{song_artist} - {song_title}"
+    directory = f"songs/{type_song}/{song_artist} - {song_title}"
     if len(trs_song) != 0:
-        os.mkdir(file_directory)
+        os.mkdir(directory)
 
     for tr in trs_song:
         no = tr.find_all("td")[0].text.strip()
@@ -89,14 +94,20 @@ async def fetch_song(session: aiohttp.ClientSession, url: str, type_song: str):
         src = song["src"]
 
         name = f"{no} - {title}"
+        name = re.sub(r'[\\/*?:"<>|]', '-', name)
+
+        file_name = f"{directory}/{name}"
+
         if song is not None:
-            await download_with_session(session, src, f"{file_directory}/{name}", "mp3")
+            await download_with_session(session, src, file_name, "mp3")
         else:
             print(f"Failed to download: {url} - {name}")
             return
 
     end = time.time()
     print(f"Downloaded: {url} in {end - start:.2f}s")
+
+    gc.collect()
 
 
 async def download_with_session(session: aiohttp.ClientSession, url: str, name: str, type: str):
