@@ -1,6 +1,7 @@
 .idea
 build
+**/*egg-info
+**/__pycache__
 **/audio
 **/icon
 **/portrait
-**/*egg-info
