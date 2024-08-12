@@ -112,30 +112,40 @@ def get_list_songs_of_type(wikitable: BeautifulSoup, type_song: str) -> list:
 
 
 def main():
+    print("Preparing to download songs...\n")
+
     setup()
 
     beautiful_soup = asyncio.run(get_beautiful_soup(url_song_list))
     wikitables = beautiful_soup.find_all("table", class_="wikitable")
 
-    # pre_existing_songs = wikitables[0]
-    # cover_songs = wikitables[1]
-    # commissioned_songs = wikitables[2]
-    # contest_songs = wikitables[3]
-    #
-    # list_pre_existing_songs = get_list_songs_of_type(pre_existing_songs, type_pre_existing_songs)
-    # list_cover_songs = get_list_songs_of_type(cover_songs, type_cover_songs)
-    # list_commissioned_songs = get_list_songs_of_type(commissioned_songs, type_commissioned_songs)
-    # list_contest_songs = get_list_songs_of_type(contest_songs, type_contest_songs)
-    #
-    # list_total_songs = list_pre_existing_songs + list_cover_songs + list_commissioned_songs + list_contest_songs
-    # songs_amount = len(list_total_songs)
-    # print(f"Fetching {songs_amount} songs...")
+    pre_existing_songs = wikitables[0]
+    cover_songs = wikitables[1]
+    commissioned_songs = wikitables[2]
+    contest_songs = wikitables[3]
+
+    list_pre_existing_songs = get_list_songs_of_type(pre_existing_songs, type_pre_existing_songs)
+    list_cover_songs = get_list_songs_of_type(cover_songs, type_cover_songs)
+    list_commissioned_songs = get_list_songs_of_type(commissioned_songs, type_commissioned_songs)
+    list_contest_songs = get_list_songs_of_type(contest_songs, type_contest_songs)
+
+    list_total_songs = list_pre_existing_songs + list_cover_songs + list_commissioned_songs + list_contest_songs
+    songs_amount = len(list_total_songs)
+    print(f"Fetching {songs_amount} songs...")
 
     # Test
-    asyncio.run(fetch_songs([{
-        "type_song": type_commissioned_songs,
-        "url": "https://projectsekai.fandom.com/wiki/Kitty"
-    }]))
+    # asyncio.run(fetch_songs([{
+    #     "type_song": type_commissioned_songs,
+    #     "url": "https://projectsekai.fandom.com/wiki/Kitty"
+    # }]))
+
+    print("Downloading songs...\n")
+    start = time.time()
+
+    asyncio.run(fetch_songs(list_total_songs))
+
+    end = time.time()
+    print(f"\nDownload finished in {end - start:.2f}s")
 
 
 if __name__ == "__main__":
