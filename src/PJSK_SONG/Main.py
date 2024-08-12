@@ -1,10 +1,34 @@
 import asyncio
 import os
 import shutil
+import threading
 import time
+import tracemalloc
 
 import aiohttp
+import psutil
 from bs4 import BeautifulSoup
+
+
+class ResourceMonitor(threading.Thread):
+    def __init__(self):
+        super().__init__()
+        self.max_memory = 0
+        self.max_cpu = 0
+        self.running = True
+        self.daemon = True
+
+    def run(self):
+        process = psutil.Process()
+        while self.running:
+            memory_info = process.memory_info()
+            cpu_percent = process.cpu_percent(interval=0.1)
+            self.max_memory = max(self.max_memory, memory_info.rss)
+            self.max_cpu = max(self.max_cpu, cpu_percent)
+            time.sleep(0.1)
+
+    def stop(self):
+        self.running = False
 
 
 # Constants
@@ -34,7 +58,7 @@ async def fetch_songs(list_songs: list):
 
 
 async def fetch_song(session: aiohttp.ClientSession, url: str, type_song: str):
-    print(f"Download: {url}...")
+    print(f"Downloading: {url}...")
     start = time.time()
 
     beautiful_soup = await get_beautiful_soup(url)
@@ -46,6 +70,7 @@ async def fetch_song(session: aiohttp.ClientSession, url: str, type_song: str):
 
     unit_div = beautiful_soup.find("div", attrs={"data-source": "unit"})
     song_artist = unit_div.find("b").find("a").text
+    song_artist.replace("/", "-")
 
     trs_song = []
     for table in article_table:
@@ -67,11 +92,11 @@ async def fetch_song(session: aiohttp.ClientSession, url: str, type_song: str):
         if song is not None:
             await download_with_session(session, src, f"{file_directory}/{name}", "mp3")
         else:
-            print(f"Failed to download: {name}")
+            print(f"Failed to download: {url} - {name}")
             return
 
     end = time.time()
-    print(f"Download: {url} finished in {end - start:.2f}s")
+    print(f"Downloaded: {url} in {end - start:.2f}s")
 
 
 async def download_with_session(session: aiohttp.ClientSession, url: str, name: str, type: str):
@@ -131,15 +156,8 @@ def main():
 
     list_total_songs = list_pre_existing_songs + list_cover_songs + list_commissioned_songs + list_contest_songs
     songs_amount = len(list_total_songs)
-    print(f"Fetching {songs_amount} songs...")
 
-    # Test
-    # asyncio.run(fetch_songs([{
-    #     "type_song": type_commissioned_songs,
-    #     "url": "https://projectsekai.fandom.com/wiki/Kitty"
-    # }]))
-
-    print("Downloading songs...\n")
+    print(f"Downloading {songs_amount} songs...\n")
     start = time.time()
 
     asyncio.run(fetch_songs(list_total_songs))
@@ -148,5 +166,24 @@ def main():
     print(f"\nDownload finished in {end - start:.2f}s")
 
 
-if __name__ == "__main__":
+def main_with_monitor():
+    tracemalloc.start()
+    monitor = ResourceMonitor()
+    monitor.start()
+
     main()
+
+    monitor.stop()
+    monitor.join()
+
+    current, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+
+    print("\nResource usage:")
+    print(f"Peak RAM usage (tracemalloc): {peak / 2 ** 20:.2f} MB")
+    print(f"Peak RAM usage (psutil): {monitor.max_memory / 2 ** 20:.2f} MB")
+    print(f"Peak CPU usage: {monitor.max_cpu:.2f}%")
+
+
+if __name__ == "__main__":
+    main_with_monitor()
