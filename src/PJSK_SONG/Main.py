@@ -5,6 +5,7 @@ import shutil
 import threading
 import time
 import tracemalloc
+import requests
 
 import aiohttp
 import psutil
@@ -42,12 +43,19 @@ url_fandom = "https://projectsekai.fandom.com"
 url_song_list = "https://projectsekai.fandom.com/wiki/Song_List"
 
 
-async def get_beautiful_soup(url: str) -> BeautifulSoup:
+async def get_beautiful_soup_aiohttp(url: str) -> BeautifulSoup:
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             if response.status != 200:
                 raise Exception(f"Failed to fetch page: {response.status}")
             return BeautifulSoup(await response.text(), "html.parser")
+
+
+async def get_beautiful_soup_requests(url: str) -> BeautifulSoup:
+    response = requests.get(url)
+    if response.status_code != 200:
+        raise Exception(f"Failed to fetch page: {response.status_code}")
+    return BeautifulSoup(response.text, "html.parser")
 
 
 async def fetch_songs(list_songs: list):
@@ -62,7 +70,7 @@ async def fetch_song(session: aiohttp.ClientSession, url: str, type_song: str):
     print(f"Downloading: {url}...")
     start = time.time()
 
-    beautiful_soup = await get_beautiful_soup(url)
+    beautiful_soup = await get_beautiful_soup_aiohttp(url)
     article_table = beautiful_soup.find_all("table", class_="article-table")
 
     song_title = beautiful_soup.find("h2", class_="pi-title").text.strip()
@@ -149,7 +157,7 @@ def main():
 
     setup()
 
-    beautiful_soup = asyncio.run(get_beautiful_soup(url_song_list))
+    beautiful_soup = asyncio.run(get_beautiful_soup_aiohttp(url_song_list))
     wikitables = beautiful_soup.find_all("table", class_="wikitable")
 
     pre_existing_songs = wikitables[0]
