@@ -51,7 +51,7 @@ async def get_beautiful_soup_aiohttp(url: str) -> BeautifulSoup:
             return BeautifulSoup(await response.text(), "html.parser")
 
 
-async def get_beautiful_soup_requests(url: str) -> BeautifulSoup:
+def get_beautiful_soup_requests(url: str) -> BeautifulSoup:
     response = requests.get(url)
     if response.status_code != 200:
         raise Exception(f"Failed to fetch page: {response.status_code}")
@@ -70,7 +70,7 @@ async def fetch_song(session: aiohttp.ClientSession, url: str, type_song: str):
     print(f"Downloading: {url}...")
     start = time.time()
 
-    beautiful_soup = await get_beautiful_soup_aiohttp(url)
+    beautiful_soup = get_beautiful_soup_requests(url)
     article_table = beautiful_soup.find_all("table", class_="article-table")
 
     song_title = beautiful_soup.find("h2", class_="pi-title").text.strip()
@@ -145,18 +145,7 @@ def setup():
     print("Setup complete!\n")
 
 
-def get_list_songs_of_type(wikitable: BeautifulSoup, type_song: str) -> list:
-    return [{
-        "type_song": type_song,
-        "url": url_fandom + tr.find_all("td")[0].find("a")["href"]
-    } for tr in wikitable.find_all("tr")[1:]]
-
-
-def main():
-    print("Preparing to download songs...\n")
-
-    setup()
-
+def fetch():
     beautiful_soup = asyncio.run(get_beautiful_soup_aiohttp(url_song_list))
     wikitables = beautiful_soup.find_all("table", class_="wikitable")
 
@@ -181,10 +170,23 @@ def main():
     end = time.time()
     print(f"\nDownload finished in {end - start:.2f}s")
 
-    # asyncio.run(fetch_songs([{
-    #     "type_song": type_commissioned_songs,
-    #     "url": "https://projectsekai.fandom.com/wiki/Flyway"
-    # }]))
+
+def get_list_songs_of_type(wikitable: BeautifulSoup, type_song: str) -> list:
+    return [{
+        "type_song": type_song,
+        "url": url_fandom + tr.find_all("td")[0].find("a")["href"]
+    } for tr in wikitable.find_all("tr")[1:]]
+
+
+def main():
+    print("Preparing to download songs...\n")
+    setup()
+    # fetch()
+
+    asyncio.run(fetch_songs([{
+        "type_song": type_commissioned_songs,
+        "url": "https://projectsekai.fandom.com/wiki/Doctor%3DFunk_Beat"
+    }]))
 
 
 def main_with_monitor():
