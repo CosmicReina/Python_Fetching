@@ -1,11 +1,10 @@
 import asyncio
 import os
+import re
 import shutil
 import threading
 import time
 import tracemalloc
-import re
-import gc
 
 import aiohttp
 import psutil
@@ -106,8 +105,6 @@ async def fetch_song(session: aiohttp.ClientSession, url: str, type_song: str):
 
     end = time.time()
     print(f"Downloaded: {url} in {end - start:.2f}s")
-
-    gc.collect()
 
 
 async def download_with_session(session: aiohttp.ClientSession, url: str, name: str, type: str):
