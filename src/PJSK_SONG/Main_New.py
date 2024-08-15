@@ -78,7 +78,7 @@ async def fetch_file(session: aiohttp.ClientSession, url: str, file_name: str, f
 
 
 async def fetch_song(session: aiohttp.ClientSession, song: dict):
-    print(f"Fetching {song['url']}...")
+    print(f"Fetching: {song['url']}...")
     start = time.time()
 
     url = urllib.parse.quote(song["url"], safe=":/")
@@ -125,7 +125,7 @@ async def fetch_song(session: aiohttp.ClientSession, song: dict):
         await fetch_file(session, src, file_name, "mp3")
 
     end = time.time()
-    print(f"Finished fetching {song['url']} in {end - start:.2f} seconds")
+    print(f"Fetched: {url} in {end - start:.2f} seconds")
 
 
 def setup():
@@ -168,7 +168,8 @@ def fetch():
     # asyncio.run(fetch_songs(list_total_songs))
     asyncio.run(fetch_songs([{
         "type": type_pre_existing_songs,
-        "url": "https://projectsekai.fandom.com/wiki/Doctor%3DFunk_Beat"
+        # "url": "https://projectsekai.fandom.com/wiki/Doctor%3DFunk_Beat"
+        "url": "https://projectsekai.fandom.com/wiki/Flyway"
     }]))
 
 
