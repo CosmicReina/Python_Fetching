@@ -110,17 +110,6 @@ def fetch():
     list_contest_songs = get_list_song_of_type(contest_songs, type_contest_songs)
 
     list_total_songs = list_pre_existing_songs + list_cover_songs + list_commissioned_songs + list_contest_songs
-    # print("\n".join([str(song) for song in list_total_songs]))
-
-    # asyncio.run(fetch_songs(
-    #     [{
-    #         "type": "pre-existing_songs",
-    #         "url": "https://projectsekai.fandom.com/wiki/Doctor%3DFunk_Beat"
-    #     },{
-    #         "type": "cover_songs",
-    #         "url": "https://projectsekai.fandom.com/wiki/Doctor%3DFunk_Beat"
-    #     }]
-    # ))
 
 
 def main():
