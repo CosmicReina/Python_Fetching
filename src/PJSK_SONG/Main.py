@@ -108,7 +108,7 @@ async def fetch_song(session: aiohttp.ClientSession, song: dict):
     for tr in trs_song:
         no = tr.find_all("td")[0].text.strip()
         title = tr.find_all("td")[1].text.strip()
-        
+
         song = tr.find_all("td")[-1].find("audio")
         if song is None:
             print(f"Audio not found: {url} - {no} - {title}")
