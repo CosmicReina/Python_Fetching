@@ -47,7 +47,7 @@ def get_beautiful_soup_requests(url: str) -> BeautifulSoup:
 
 def get_list_song_of_type(wikitable: BeautifulSoup, type: str) -> list:
     return [{
-        "type_song": type,
+        "type": type,
         "url": url_fandom + tr.find_all("td")[0].find("a")["href"]
     } for tr in wikitable.find_all("tr")[1:]]
 
