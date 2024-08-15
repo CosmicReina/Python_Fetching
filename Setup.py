@@ -9,5 +9,6 @@ setup(
         "aiohttp",
         "unidecode",
         "psutil",
+        "httpx",
     ]
 )

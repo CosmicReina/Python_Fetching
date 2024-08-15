@@ -78,11 +78,11 @@ async def fetch_file(session: aiohttp.ClientSession, url: str, file_name: str, f
 
 
 async def fetch_song(session: aiohttp.ClientSession, song: dict):
-    print(f"Fetching: {song['url']}...")
-    start = time.time()
-
-    url = urllib.parse.quote(song["url"], safe=":/")
+    url = song["url"]
     type = song["type"]
+
+    print(f"Fetching: {url}...")
+    start = time.time()
 
     beautiful_soup = await get_beautiful_soup_aiohttp(url)
     article_table = beautiful_soup.find_all("table", class_="article-table")
@@ -168,7 +168,9 @@ def fetch():
     # asyncio.run(fetch_songs(list_total_songs))
     asyncio.run(fetch_songs([{
         "type": type_pre_existing_songs,
-        # "url": "https://projectsekai.fandom.com/wiki/Doctor%3DFunk_Beat"
+        "url": "https://projectsekai.fandom.com/wiki/Doctor%3DFunk_Beat"
+    }, {
+        "type": type_cover_songs,
         "url": "https://projectsekai.fandom.com/wiki/Flyway"
     }]))
 
