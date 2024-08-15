@@ -83,7 +83,7 @@ async def fetch_song(session: aiohttp.ClientSession, song: dict):
     print(f"Fetching: {url}...")
     start = time.time()
 
-    beautiful_soup = await get_beautiful_soup_aiohttp(url)
+    beautiful_soup = await asyncio.get_event_loop().run_in_executor(None, get_beautiful_soup_requests, url)
     article_table = beautiful_soup.find_all("table", class_="article-table")
 
     song_title = beautiful_soup.find("h2", class_="pi-title").text.strip()
