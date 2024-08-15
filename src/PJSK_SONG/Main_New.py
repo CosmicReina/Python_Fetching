@@ -48,12 +48,6 @@ def get_beautiful_soup_requests(url: str) -> BeautifulSoup:
     return BeautifulSoup(response.text, 'html.parser')
 
 
-async def get_beautiful_soup_aiohttp(url: str) -> BeautifulSoup:
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            return BeautifulSoup(await response.text(), 'html.parser')
-
-
 def get_list_song_of_type(wikitable: BeautifulSoup, type: str) -> list:
     return [{
         "type": type,
@@ -164,14 +158,7 @@ def fetch():
 
     list_total_songs = list_pre_existing_songs + list_cover_songs + list_commissioned_songs + list_contest_songs
 
-    # asyncio.run(fetch_songs(list_total_songs))
-    asyncio.run(fetch_songs([{
-        "type": type_pre_existing_songs,
-        "url": "https://projectsekai.fandom.com/wiki/Doctor%3DFunk_Beat"
-    }, {
-        "type": type_cover_songs,
-        "url": "https://projectsekai.fandom.com/wiki/Flyway"
-    }]))
+    asyncio.run(fetch_songs(list_total_songs))
 
 
 def main():
