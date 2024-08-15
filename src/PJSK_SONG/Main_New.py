@@ -87,14 +87,14 @@ async def fetch_song(session: aiohttp.ClientSession, song: dict):
 
     try:
         unit_div = beautiful_soup.find("div", attrs={"data-source": "unit"})
-        song_artist_b = unit_div.find("b")
-        if song_artist_b is not None:
-            song_artist_a = song_artist_b.find("a")
-            song_artist = re.sub(r'[\\/*?:"<>|]', '-', song_artist_a.text.strip())
+        song_unit_b = unit_div.find("b")
+        if song_unit_b is not None:
+            song_unit_a = song_unit_b.find("a")
+            song_artist = re.sub(r'[\\/*?:"<>|]', '-', song_unit_a.text.strip())
         else:
-            unit_div = beautiful_soup.find("div", attrs={"data-source": "composer"})
-            song_artist_div = unit_div.find("div")
-            song_artist = re.sub(r'[\\/*?:"<>|]', '-', song_artist_div.text.strip())
+            composer_div = beautiful_soup.find("div", attrs={"data-source": "composer"})
+            song_composer_div = composer_div.find("div")
+            song_artist = re.sub(r'[\\/*?:"<>|]', '-', song_composer_div.text.strip())
     except AttributeError:
         print(f"Artist not found: {url}")
         return
