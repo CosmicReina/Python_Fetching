@@ -1,9 +1,12 @@
+import asyncio
 import os
 import shutil
 import threading
 import time
 import tracemalloc
+import urllib.parse
 
+import aiohttp
 import psutil
 import requests
 from bs4 import BeautifulSoup
@@ -45,11 +48,30 @@ def get_beautiful_soup_requests(url: str) -> BeautifulSoup:
     return BeautifulSoup(response.text, 'html.parser')
 
 
+async def get_beautiful_soup_aiohttp(url: str) -> BeautifulSoup:
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            return BeautifulSoup(await response.text(), 'html.parser')
+
+
 def get_list_song_of_type(wikitable: BeautifulSoup, type: str) -> list:
     return [{
         "type": type,
         "url": url_fandom + tr.find_all("td")[0].find("a")["href"]
     } for tr in wikitable.find_all("tr")[1:]]
+
+
+async def fetch_songs(list_songs: list):
+    async with aiohttp.ClientSession() as session:
+        tasks = [asyncio.create_task(fetch_song(session, song)) for song in list_songs]
+        finished, unfinished = await asyncio.wait(tasks)
+
+
+async def fetch_song(session: aiohttp.ClientSession, song: dict):
+    print(f"Fetching song: {song['url']}")
+    url = urllib.parse.quote(song["url"], safe=":/")
+    beautiful_soup = await get_beautiful_soup_aiohttp(url)
+    print(f"Fetched song: {song['url']}")
 
 
 def setup():
@@ -88,7 +110,17 @@ def fetch():
     list_contest_songs = get_list_song_of_type(contest_songs, type_contest_songs)
 
     list_total_songs = list_pre_existing_songs + list_cover_songs + list_commissioned_songs + list_contest_songs
-    print("\n".join([str(song) for song in list_total_songs]))
+    # print("\n".join([str(song) for song in list_total_songs]))
+
+    # asyncio.run(fetch_songs(
+    #     [{
+    #         "type": "pre-existing_songs",
+    #         "url": "https://projectsekai.fandom.com/wiki/Doctor%3DFunk_Beat"
+    #     },{
+    #         "type": "cover_songs",
+    #         "url": "https://projectsekai.fandom.com/wiki/Doctor%3DFunk_Beat"
+    #     }]
+    # ))
 
 
 def main():
