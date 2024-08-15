@@ -10,5 +10,6 @@ setup(
         "unidecode",
         "psutil",
         "httpx",
+        "grequests",
     ]
 )
