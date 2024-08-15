@@ -5,7 +5,6 @@ import shutil
 import threading
 import time
 import tracemalloc
-import urllib.parse
 
 import aiohttp
 import psutil
