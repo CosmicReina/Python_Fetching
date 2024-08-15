@@ -5,6 +5,7 @@ import threading
 import time
 import tracemalloc
 import urllib.parse
+import re
 
 import aiohttp
 import psutil
@@ -65,13 +66,66 @@ async def fetch_songs(list_songs: list):
     async with aiohttp.ClientSession() as session:
         tasks = [asyncio.create_task(fetch_song(session, song)) for song in list_songs]
         finished, unfinished = await asyncio.wait(tasks)
+        print(f"\nSongs fetched: {len(finished)}")
+        print(f"Songs failed: {len(unfinished)}")
+
+
+async def fetch_file(session: aiohttp.ClientSession, url: str, file_name: str, file_type: str):
+    async with session.get(url) as response:
+        file_name = f"{file_name}.{file_type}"
+        with open(file_name, "wb") as file:
+            file.write(await response.read())
 
 
 async def fetch_song(session: aiohttp.ClientSession, song: dict):
-    print(f"Fetching song: {song['url']}")
+    print(f"Fetching {song['url']}...")
+    start = time.time()
+
     url = urllib.parse.quote(song["url"], safe=":/")
+    type = song["type"]
+
     beautiful_soup = await get_beautiful_soup_aiohttp(url)
-    print(f"Fetched song: {song['url']}")
+    article_table = beautiful_soup.find_all("table", class_="article-table")
+
+    song_title = beautiful_soup.find("h2", class_="pi-title").text.strip()
+    if song_title is None:
+        return
+    song_title = re.sub(r'[\\/*?:"<>|]', '-', song_title)
+
+    unit_div = beautiful_soup.find("div", attrs={"data-source": "unit"})
+    if unit_div is None:
+        return
+    song_artist = unit_div.find("b").find("a").text.strip()
+    song_artist = re.sub(r'[\\/*?:"<>|]', '-', song_artist)
+
+    trs_song = []
+    for table in article_table:
+        trs = table.find_all("tr")
+        for tr in trs[1:]:
+            trs_song.append(tr)
+
+    directory = f"songs/{type}/{song_artist} - {song_title}"
+    if len(trs_song) != 0:
+        os.mkdir(directory)
+
+    for tr in trs_song:
+        no = tr.find_all("td")[0].text.strip()
+        title = tr.find_all("td")[1].text.strip()
+        song = tr.find_all("td")[-1].find("audio")
+        if song is None:
+            print(f"Audio not found: {url} - {no} - {title}")
+            continue
+        src = song["src"]
+
+        name = f"{no} - {title}"
+        name = re.sub(r'[\\/*?:"<>|]', '-', name)
+
+        file_name = f"{directory}/{name}"
+
+        await fetch_file(session, src, file_name, "mp3")
+
+    end = time.time()
+    print(f"Finished fetching {song['url']} in {end - start:.2f} seconds")
 
 
 def setup():
@@ -110,6 +164,12 @@ def fetch():
     list_contest_songs = get_list_song_of_type(contest_songs, type_contest_songs)
 
     list_total_songs = list_pre_existing_songs + list_cover_songs + list_commissioned_songs + list_contest_songs
+
+    # asyncio.run(fetch_songs(list_total_songs))
+    asyncio.run(fetch_songs(l[{
+        "type": type_pre_existing_songs,
+        "url": "https://projectsekai.fandom.com/wiki/Doctor%3DFunk_Beat"
+    }]))
 
 
 def main():
