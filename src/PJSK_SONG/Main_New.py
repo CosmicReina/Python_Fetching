@@ -85,11 +85,19 @@ async def fetch_song(session: aiohttp.ClientSession, song: dict):
         return
     song_title = re.sub(r'[\\/*?:"<>|]', '-', song_title)
 
-    unit_div = beautiful_soup.find("div", attrs={"data-source": "unit"})
-    if unit_div is None:
+    try:
+        unit_div = beautiful_soup.find("div", attrs={"data-source": "unit"})
+        song_artist_b = unit_div.find("b")
+        if song_artist_b is not None:
+            song_artist_a = song_artist_b.find("a")
+            song_artist = re.sub(r'[\\/*?:"<>|]', '-', song_artist_a.text.strip())
+        else:
+            unit_div = beautiful_soup.find("div", attrs={"data-source": "composer"})
+            song_artist_div = unit_div.find("div")
+            song_artist = re.sub(r'[\\/*?:"<>|]', '-', song_artist_div.text.strip())
+    except AttributeError:
+        print(f"Artist not found: {url}")
         return
-    song_artist = unit_div.find("b").find("a").text.strip()
-    song_artist = re.sub(r'[\\/*?:"<>|]', '-', song_artist)
 
     trs_song = []
     for table in article_table:
