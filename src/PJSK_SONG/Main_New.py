@@ -1,11 +1,11 @@
 import asyncio
 import os
+import re
 import shutil
 import threading
 import time
 import tracemalloc
 import urllib.parse
-import re
 
 import aiohttp
 import psutil
@@ -166,7 +166,7 @@ def fetch():
     list_total_songs = list_pre_existing_songs + list_cover_songs + list_commissioned_songs + list_contest_songs
 
     # asyncio.run(fetch_songs(list_total_songs))
-    asyncio.run(fetch_songs(l[{
+    asyncio.run(fetch_songs([{
         "type": type_pre_existing_songs,
         "url": "https://projectsekai.fandom.com/wiki/Doctor%3DFunk_Beat"
     }]))
