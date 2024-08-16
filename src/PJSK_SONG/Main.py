@@ -58,9 +58,7 @@ def get_list_song_of_type(wikitable: BeautifulSoup, type: str) -> list:
 async def fetch_songs(list_songs: list):
     async with aiohttp.ClientSession() as session:
         tasks = [asyncio.create_task(fetch_song(session, song)) for song in list_songs]
-        finished, unfinished = await asyncio.wait(tasks)
-        print(f"\nSongs fetched: {len(finished)}")
-        print(f"Songs failed: {len(unfinished)}")
+        await asyncio.gather(*tasks)
 
 
 async def fetch_file(session: aiohttp.ClientSession, url: str, file_name: str, file_type: str):
