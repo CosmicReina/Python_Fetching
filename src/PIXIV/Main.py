@@ -17,7 +17,7 @@ url_search = "https://www.pixiv.net/en/tags/"
 
 
 # Functions
-async def get_beautiful_soup(url):
+async def get_beautiful_soup(url: str):
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
             if response.status != 200:
@@ -38,14 +38,15 @@ def setup():
 
 
 def fetch(tags: str):
-    pass
+    url = f"{url_search}{tags}"
+    beautiful_soup = asyncio.run(get_beautiful_soup(url))
+    print(beautiful_soup.prettify())
 
 def main():
-    tags = ""
+    tags = "暁山瑞希"
 
     setup()
     fetch(tags)
-
 
 
 if __name__ == "__main__":
