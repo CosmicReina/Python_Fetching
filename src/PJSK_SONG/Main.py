@@ -99,7 +99,7 @@ async def fetch_song(session: aiohttp.ClientSession, song: dict):
         for tr in trs[1:]:
             trs_song.append(tr)
 
-    directory = f"songs/{type}/{song_artist} - {song_title}"
+    directory = f"song/{type}/{song_artist} - {song_title}"
     if len(trs_song) != 0:
         os.mkdir(directory)
 
@@ -131,16 +131,16 @@ def setup():
         print("Removing existing 'songs' directory...")
         shutil.rmtree("songs")
 
-    print("Creating 'songs' directory...")
-    os.mkdir("songs")
-    print("Creating 'songs/pre-existing_songs' directory...")
-    os.mkdir("songs/pre-existing_songs")
-    print("Creating 'songs/cover_songs' directory...")
-    os.mkdir("songs/cover_songs")
-    print("Creating 'songs/commissioned_songs' directory...")
-    os.mkdir("songs/commissioned_songs")
-    print("Creating 'songs/contest_songs' directory...")
-    os.mkdir("songs/contest_songs")
+    print("Creating 'song' directory...")
+    os.mkdir("song")
+    print("Creating 'song/pre-existing_songs' directory...")
+    os.mkdir("song/pre-existing_songs")
+    print("Creating 'song/cover_songs' directory...")
+    os.mkdir("song/cover_songs")
+    print("Creating 'song/commissioned_songs' directory...")
+    os.mkdir("song/commissioned_songs")
+    print("Creating 'song/contest_songs' directory...")
+    os.mkdir("song/contest_songs")
 
     print("Setup complete!\n")
 

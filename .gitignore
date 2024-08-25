@@ -5,5 +5,7 @@ build
 **/audio
 **/icon
 **/portrait
-**/songs
+**/song
+**/image
+
 **/Test.py

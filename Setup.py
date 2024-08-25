@@ -11,5 +11,7 @@ setup(
         "psutil",
         "httpx",
         "grequests",
+        "tqdm",
+        "rich",
     ]
 )
