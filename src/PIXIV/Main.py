@@ -14,6 +14,7 @@ headers = {
 
 url = "https://www.pixiv.net/"
 url_search = "https://www.pixiv.net/en/tags/"
+extra = "artworks?ai_type=1"
 
 
 # Functions
@@ -36,9 +37,11 @@ def setup():
     print("Creating 'image' directory...")
     os.mkdir("image")
 
+    print("Setup complete!\n")
+
 
 def fetch(tags: str):
-    url = f"{url_search}{tags}"
+    url = f"{url_search}{tags}/{extra}"
     beautiful_soup = asyncio.run(get_beautiful_soup(url))
     print(beautiful_soup.prettify())
 
