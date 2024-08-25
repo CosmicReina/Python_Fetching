@@ -15,6 +15,7 @@ headers = {
 url = "https://www.pixiv.net/"
 url_search = "https://www.pixiv.net/en/tags/"
 
+
 # Functions
 async def get_beautiful_soup(url):
     async with aiohttp.ClientSession() as session:
@@ -36,8 +37,15 @@ def setup():
     os.mkdir("image")
 
 
+def fetch(tags: str):
+    pass
+
 def main():
+    tags = ""
+
     setup()
+    fetch(tags)
+
 
 
 if __name__ == "__main__":
