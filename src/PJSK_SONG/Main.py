@@ -127,9 +127,9 @@ async def fetch_song(session: aiohttp.ClientSession, song: dict):
 def setup():
     print("Setting up...")
 
-    if os.path.exists("songs"):
-        print("Removing existing 'songs' directory...")
-        shutil.rmtree("songs")
+    if os.path.exists("song"):
+        print("Removing existing 'song' directory...")
+        shutil.rmtree("song")
 
     print("Creating 'song' directory...")
     os.mkdir("song")
